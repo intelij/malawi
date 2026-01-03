@@ -3,9 +3,10 @@
 namespace App\Listeners\Registration;
 
 use Illuminate\Auth\Events\Registered;
-use Mail;
+// use Mail;
 use App\Models\Role;
 use App\Repositories\User\UserRepository;
+use Illuminate\Support\Facades\Mail;
 
 class SendSignUpNotification
 {
