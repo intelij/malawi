@@ -6,7 +6,7 @@
 
 <div class="col-md-8 col-lg-6 col-xl-5 mx-auto my-10p">
     <div class="text-center">
-        <x-logo />
+        {{-- <x-logo /> --}}
     </div>
 
     <div class="card mt-5">

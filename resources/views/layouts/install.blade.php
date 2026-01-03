@@ -18,7 +18,7 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-6 offset-3 logo-wrapper">
-                <x-logo class="logo" />
+                {{-- <x-logo class="logo" /> --}}
             </div>
         </div>
         <div class="wizard col-md-6 offset-3">

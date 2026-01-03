@@ -2,7 +2,7 @@
     {{-- Header --}}
     @slot('header')
         @component('mail::header', ['url' => config('app.url')])
-            <x-logo />
+            {{-- <x-logo /> --}}
         @endcomponent
     @endslot
 
