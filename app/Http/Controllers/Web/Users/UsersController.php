@@ -164,6 +164,8 @@ class UsersController extends Controller
         $fundraiser->created_by = auth()->id();
         $fundraiser->save();
 
+        $fundraiserId = $fundraiser->id;
+
         $fullname = $request->get('full_name');
 
         // For the bereaved member register null payment
@@ -171,6 +173,7 @@ class UsersController extends Controller
             $payment = new Payment();
             $payment->image_name = "Not Applicable";
             $payment->user_id = $request->get('user_id');
+            $payment->fundraiser_id = $fundraiserId;
             $payment->payment_type = 'Bereaved';
             $payment->reference = $request->get('reference');
             $payment->save();
@@ -228,42 +231,85 @@ class UsersController extends Controller
         return view('user.stale', compact('users', 'statuses', 'fundraiser_user_ids'));
     }
 
-    public function createInvoice(Fundraiser $fundraiser, Payment $payment): View
+    public function createInvoice(): View
     {
-        // First query to get the already paid invoices references
-        $alreadyPaidInvoices = $payment->where('user_id', auth()->user()->id)
-            ->where('payment_type', 'Bereavement Fund')
+        $user = auth()->user();
+
+        /*
+        * 1. Get all fundraiser IDs that are already PAID
+        *    (Bereavement Fund OR Bereaved)
+        */
+        $paidFundraiserIds = Payment::where('user_id', $user->id)
             ->whereNotNull('fundraiser_id')
+            ->whereIn('payment_type', ['Bereavement Fund', 'Bereaved'])
             ->pluck('fundraiser_id');
 
-        // Unpaid fundraisers
-        $fundraisers = Fundraiser::leftJoin('users', 'users.id', '=', 'fundraisers.user_id')
-            ->leftJoin('payments', 'payments.fundraiser_id', '=', 'fundraisers.id')
-            ->where('payments.payment_type', '!=', 'Bereavement Fund')
-            ->whereNotIn('fundraisers.id', $alreadyPaidInvoices)
-            ->select('fundraisers.*', 'fundraisers.id as fund_id', 'users.*', 'payments.*')
-            ->get();
-
-        // $user_registerd = Auth::getUser()->created_at;
-        $user_registered = Auth::getUser()->created_at->format('Y-m-d H:i:s');
-
+        /*
+        * 2. Get all UNPAID fundraisers for this user
+        *    - Exclude paid ones
+        *    - Only fundraisers created after user registration
+        */
         $unpaidFundraisers = Fundraiser::with(['user', 'payments'])
-            ->whereNotIn('fundraisers.id', $alreadyPaidInvoices)
-            ->where('fundraisers.created_at', '>=', $user_registered)
+            ->whereNotIn('id', $paidFundraiserIds)
+            ->where('created_at', '>=', $user->created_at)
+            ->orderByDesc('created_at')
             ->get();
 
+        /*
+        * 3. Latest unpaid fundraiser (true latest)
+        */
         $latestFundraiser = $unpaidFundraisers->first();
 
-        // Get all paid fundraisers
-        $paidFundraisers = $payment
-            ->where('user_id', auth()->id())
-            ->whereNotNull('fundraiser_id')
-            ->pluck('fundraiser_id');
-
+        /*
+        * 4. Total unpaid fundraisers
+        */
         $totalFundraisers = $unpaidFundraisers->count();
 
-        return view('invoice.create', compact('fundraisers', 'latestFundraiser', 'totalFundraisers', 'paidFundraisers', 'alreadyPaidInvoices', 'unpaidFundraisers'));
+        return view('invoice.create', [
+            'unpaidFundraisers'   => $unpaidFundraisers,
+            'latestFundraiser'    => $latestFundraiser,
+            'totalFundraisers'    => $totalFundraisers,
+            'paidFundraiserIds'   => $paidFundraiserIds,
+        ]);
     }
+
+    // public function createInvoice(Fundraiser $fundraiser, Payment $payment): View
+    // {
+
+    //     // First query to get the already paid invoices references
+    //     $alreadyPaidInvoices = $payment->where('user_id', auth()->user()->id)
+    //         ->where('payment_type', 'Bereavement Fund')
+    //         ->whereNotNull('fundraiser_id')
+    //         ->pluck('fundraiser_id');
+
+    //     // Unpaid fundraisers
+    //     $fundraisers = Fundraiser::leftJoin('users', 'users.id', '=', 'fundraisers.user_id')
+    //         ->leftJoin('payments', 'payments.fundraiser_id', '=', 'fundraisers.id')
+    //         ->where('payments.payment_type', '!=', 'Bereavement Fund')
+    //         ->whereNotIn('fundraisers.id', $alreadyPaidInvoices)
+    //         ->select('fundraisers.*', 'fundraisers.id as fund_id', 'users.*', 'payments.*')
+    //         ->get();
+
+    //     // $user_registerd = Auth::getUser()->created_at;
+    //     $user_registered = Auth::getUser()->created_at->format('Y-m-d H:i:s');
+
+    //     $unpaidFundraisers = Fundraiser::with(['user', 'payments'])
+    //         ->whereNotIn('fundraisers.id', $alreadyPaidInvoices)
+    //         ->where('fundraisers.created_at', '>=', $user_registered)
+    //         ->get();
+
+    //     $latestFundraiser = $unpaidFundraisers->first();
+
+    //     // Get all paid fundraisers
+    //     $paidFundraisers = $payment
+    //         ->where('user_id', auth()->id())
+    //         ->whereNotNull('fundraiser_id')
+    //         ->pluck('fundraiser_id');
+
+    //     $totalFundraisers = $unpaidFundraisers->count();
+
+    //     return view('invoice.create', compact('fundraisers', 'latestFundraiser', 'totalFundraisers', 'paidFundraisers', 'alreadyPaidInvoices', 'unpaidFundraisers'));
+    // }
 
 }
 
