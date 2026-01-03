@@ -92,7 +92,7 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
 
     Route::get('/checkout', [PaymentController::class, 'checkout'])->name('checkout');
     Route::post('/create-payment-intent', [PaymentController::class, 'createPaymentIntent'])->name('payment.intent');
-    Route::post('/payment-success', [PaymentController::class, 'paymentSuccess'])->name('payment.success');
+    // Route::post('/payment-success', [PaymentController::class, 'paymentSuccess'])->name('payment.success');
     Route::get('/payment-success', [PaymentController::class, 'paymentSuccess'])->name('payment.success');
 
 });
