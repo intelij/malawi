@@ -1,0 +1,42 @@
+<?php
+
+namespace Database\Factories;
+
+use Illuminate\Database\Eloquent\Factories\Factory;
+use App\Models\Role;
+use App\Models\User;
+
+class UserFactory extends Factory
+{
+    /**
+     * The name of the factory's corresponding model.
+     *
+     * @var string
+     */
+    protected $model = User::class;
+
+    /**
+     * Define the model's default state.
+     *
+     * @return array
+     */
+    public function definition()
+    {
+        return [
+            'email' => $this->faker->email,
+            'password' => '$2y$10$A2A/2IIP.jsLzIiAPr.enuzxzRWzIzLWifqNU33PWPBGx6mkJFz72', // 123123123
+            'first_name' => $this->faker->firstName,
+            'last_name' => $this->faker->lastName,
+            'phone' => $this->faker->phoneNumber,
+            'avatar' => null,
+            'address' => $this->faker->address,
+            'country_id' => function () {
+                return $this->faker->randomElement(\App\Models\Country::pluck('id')->toArray());
+            },
+            'role_id' => Role::factory(),
+            'status' => \App\Support\Enum\UserStatus::ACTIVE,
+            'birthday' => $this->faker->date(),
+            'email_verified_at' => (string) now(),
+        ];
+    }
+}
