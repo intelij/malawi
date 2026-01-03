@@ -46,7 +46,7 @@ class RegisterRequest extends Request
             $status = UserStatus::ACTIVE;
         }
 
-        return array_merge($this->only('email', 'password', 'first_name', 'last_name', 'phone', 'birthday'), [
+        return array_merge($this->only('email', 'password', 'first_name', 'last_name', 'phone', 'birthday', 'username'), [
             'status' => $status,
             'email_verified_at' => setting('reg_email_confirmation') ? null : now(),
         ]);

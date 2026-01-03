@@ -27,6 +27,10 @@ class RegisterController extends Controller
 
     public function register(RegisterRequest $request, RoleRepository $roles): RedirectResponse
     {
+        $data = $request->validFormData() + [
+            'username' => $request->get('email'),
+        ];
+
         $user = $this->users->create(
             array_merge(
                 $request->validFormData(),
