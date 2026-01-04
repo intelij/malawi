@@ -117,6 +117,41 @@
                                 </div>
 
 
+                                <!-- Contribution Amount -->
+                                <div class="form-group my-4">
+                                    <label for="amount">@lang('Registration Fee')</label>
+                                    <input type="number" step="0.01" id="amount" name="amount"
+                                        class="form-control input-solid"
+                                        value="10">
+                                        {{-- value="{{ number_format((float) $unpaidFundraisers->first()->amount, 2, '.', '') ?? 0 }}"> --}}
+
+                                </div>
+
+                                <hr>
+
+                                <!-- Cardholder Name -->
+                                <div class="mb-3">
+                                    <label for="cardholder-name" class="form-label">Cardholder Name!</label>
+                                    <input type="text" id="cardholder-name" class="form-control input-solid" required>
+                                </div>
+
+                                <!-- Postcode -->
+                                <div class="mb-3">
+                                    <label for="postcode" class="form-label">Postcode</label>
+                                    <input type="text" id="postcode" class="form-control input-solid" required>
+                                </div>
+
+                                <!-- Card Element -->
+                                <div class="mb-3">
+                                    <label for="card-element" class="form-label">Card Details</label>
+                                    <div id="card-element" class="form-control input-solid"></div>
+                                </div>
+
+                                {{-- <!-- Pay Button -->
+                                <button id="submit" class="btn btn-primary mt-3 w-100">
+                                    Pay Now
+                                </button> --}}
+
                                 @if (setting('tos'))
 
                                     <div class="form-group">
@@ -127,13 +162,6 @@
                                         </label>
                                     </div>
 
-                                    {{-- <div class="custom-control custom-checkbox">
-                                        <input type="checkbox" class="custom-control-input" name="tos" id="tos" value="1"/>
-                                        <label class="custom-control-label font-weight-normal" for="tos">
-                                            @lang('I accept')
-                                            <a href="#tos-modal" data-toggle="modal">@lang('Terms of Service')</a>
-                                        </label>
-                                    </div> --}}
                                 @endif
 
                                 {{-- Only display captcha if it is enabled --}}
@@ -144,10 +172,15 @@
                                 @endif
                                 {{-- end captcha --}}
 
+                                <!-- Pay Button -->
                                 <div class="form-group mt-4">
-                                    <button type="submit" class="btn btn-primary btn-lg btn-block careox-btn" id="btn-login" > {{-- onclick="this.innerHTML = 'Processing ...!'" --}}
-                                        @lang('Register')
+                                    <button id="submit" class="btn btn-primary mt-3 w-100">
+                                        Pay Now
                                     </button>
+                                    {{-- <button type="submit" class="btn btn-primary btn-lg btn-block careox-btn" id="btn-login" > --}}
+                                        {{-- onclick="this.innerHTML = 'Processing ...!'" --}}
+                                        {{-- @lang('Register') --}}
+                                    {{-- </button> --}}
                                 </div>
 
                             </div>
@@ -200,3 +233,126 @@
 @section('scripts')
     {!! JsValidator::formRequest('App\Http\Requests\Auth\RegisterRequest', '#registration-form') !!}
 @stop
+
+
+{{-- @php
+    $amountDollars = $unpaidFundraisers->first()->amount ?? 0;
+    $amountCents = (int) round($amountDollars * 100);
+@endphp --}}
+
+<script src="https://js.stripe.com/v3/"></script>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const stripe = Stripe("{{ config('services.stripe.key') }}");
+    const form = document.getElementById("payment-form");
+    const submitButton = document.getElementById("submit");
+    const linkedAccountsInput = document.getElementById("linked_accounts");
+    const amountInput = document.getElementById("amount");
+    const BASE_AMOUNT = parseFloat(amountInput.value) || 0;
+
+    const elements = stripe.elements();
+    const cardElement = elements.create("card", { hidePostalCode: true });
+    cardElement.mount("#card-element");
+
+    linkedAccountsInput.addEventListener("input", () => {
+        const accounts = linkedAccountsInput.value.split(",")
+            .map(a => a.trim())
+            .filter(a => a.length > 0);
+
+        const total = BASE_AMOUNT * (1 + accounts.length);
+        amountInput.value = total.toFixed(2);
+    });
+
+    form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        submitButton.disabled = true;
+        submitButton.textContent = "Processing...";
+
+        const cardholderName = document.getElementById("cardholder-name").value.trim();
+        const postcode = document.getElementById("postcode").value.trim();
+        const amount = parseFloat(amountInput.value);
+
+        if (!cardholderName || !postcode || !amount) {
+            alert("Please complete all required fields.");
+            submitButton.disabled = false;
+            submitButton.textContent = "Pay Now";
+            return;
+        }
+
+        const formData = new FormData(form);
+        let bodyData = {};
+        formData.forEach((value, key) => { bodyData[key] = value; });
+
+        // ✅ Send amount in dollars (not cents)
+        bodyData.amount = parseFloat(amount.toFixed(2));
+        bodyData.linked_accounts = linkedAccountsInput.value.trim();
+
+        try {
+            const res = await fetch("{{ route('payment.intent') }}", {
+                method: "POST",
+                headers: {
+                    "X-CSRF-TOKEN": "{{ csrf_token() }}",
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(bodyData)
+            });
+
+            const data = await res.json();
+            console.log("Stripe response:", data);
+
+            if (data.clientSecret) {
+                const { error, paymentIntent } = await stripe.confirmCardPayment(data.clientSecret, {
+                    payment_method: {
+                        card: cardElement,
+                        billing_details: {
+                            name: cardholderName,
+                            address: { postal_code: postcode }
+                        }
+                    }
+                });
+
+                if (error) {
+                    alert("Payment failed: " + error.message);
+                    submitButton.disabled = false;
+                    submitButton.textContent = "Pay Now";
+                    return;
+                }
+
+                // if (paymentIntent && paymentIntent.status === "succeeded") {
+                //     window.location.href = "{{ route('payment.success') }}?paymentIntent=" + paymentIntent.id;
+                // }
+
+                if (paymentIntent && paymentIntent.status === "succeeded") {
+                    // Get the form element and form data
+                    const form = document.getElementById('payment-form');
+                    const formData = new FormData(form);
+
+                    // Build query string from form data
+                    const params = new URLSearchParams();
+                    formData.forEach((value, key) => {
+                        params.append(key, value);
+                    });
+
+                    // Add Stripe paymentIntent ID
+                    params.append('paymentIntent', paymentIntent.id);
+
+                    // Redirect to Laravel success route with all form data
+                    window.location.href = "{{ route('payment.success') }}?" + params.toString();
+                }
+
+            } else if (data.success) { // ✅ Updated condition
+                alert(data.message || "Invoices created and marked as paid successfully.");
+                window.location.href = "{{ route('payment.success') }}";
+            } else {
+                throw new Error("Unexpected response from server.");
+            }
+
+        } catch (err) {
+            console.error("Payment error:", err);
+            alert("An unexpected error occurred: " + err.message);
+            submitButton.disabled = false;
+            submitButton.textContent = "Pay Now";
+        }
+    });
+});
+</script>

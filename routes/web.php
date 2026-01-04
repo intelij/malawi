@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\PaidRegisterController;
 use \App\Http\Controllers\Web\Auth\LoginController;
 use \App\Http\Controllers\Web\Auth\RegisterController;
 use \App\Http\Controllers\Web\Auth\TwoFactorTokenController;
@@ -34,8 +35,20 @@ Route::post('login', [LoginController::class, 'login'])->name('login');
 Route::get('logout', [LoginController::class, 'logout'])->name('auth.logout');
 
 Route::group(['middleware' => ['registration', 'guest']], function () {
-    Route::get('register', [RegisterController::class, 'show']);
-    Route::post('register', [RegisterController::class, 'register']);
+    // Route::get('register', [RegisterController::class, 'show']);
+    // Route::post('register', [RegisterController::class, 'register']);
+
+
+
+Route::get('/register', [PaidRegisterController::class, 'show'])
+    ->name('register');
+
+Route::post('/register/intent', [PaidRegisterController::class, 'createPaymentIntent'])
+    ->name('register.intent');
+
+Route::post('/register/complete', [PaidRegisterController::class, 'complete'])
+    ->name('register.complete');
+
 });
 
 Route::emailVerification();
