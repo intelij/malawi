@@ -47,9 +47,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const data = await response.json();
 
+            console.log("Debug number 1");
+
             if (!data.clientSecret) {
                 throw new Error("Failed to create payment intent");
             }
+
+            console.log("Debug number 2");
 
             const { error, paymentIntent } =
                 await stripe.confirmCardPayment(data.clientSecret, {
@@ -69,6 +73,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
 
+            console.log("Debug number 3");
+
             if (paymentIntent.status === "succeeded") {
                 // 🔥 Inject paymentIntent ID into the form
                 const hiddenInput = document.createElement("input");
@@ -77,9 +83,13 @@ document.addEventListener("DOMContentLoaded", () => {
                 hiddenInput.value = paymentIntent.id;
                 registrationForm.appendChild(hiddenInput);
 
+                console.log("Debug number 3a");
+
                 // ✅ Submit real HTML form
                 registrationForm.submit();
             }
+
+            console.log("Debug number 4");
 
         } catch (err) {
             console.error("Payment error:", err);

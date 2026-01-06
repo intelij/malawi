@@ -20,7 +20,7 @@
             <form id="registration-form"
                   method="POST"
                   action="{{ route('register.complete') }}"
-                  data-intent-url="{{ route('payment.intent') }}"
+                  data-intent-url="{{ route('pay.intent') }}"
                   autocomplete="off">
 
                 @csrf
@@ -50,7 +50,7 @@
                 <label>Registration Fee</label>
                 <input type="number" name="amount" id="amount"
                        class="form-control input-solid mb-3"
-                       value="10.00" readonly>
+                       value="999.00" readonly>
 
                 <input type="text" id="cardholder-name"
                        class="form-control input-solid mb-3"
