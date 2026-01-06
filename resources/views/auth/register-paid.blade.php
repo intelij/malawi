@@ -21,137 +21,55 @@
                   method="POST"
                   action="{{ route('register.complete') }}"
                   data-intent-url="{{ route('payment.intent') }}"
-                  autocomplete="off"
-                  enctype="multipart/form-data">
+                  autocomplete="off">
 
                 @csrf
 
+                <input type="hidden" name="payment_intent_id" id="payment_intent_id">
+
                 {{-- USER DETAILS --}}
-                <div class="form-group">
-                    <input type="text" name="first_name" class="form-control input-solid"
-                           placeholder="@lang('First Name')" required>
-                </div>
+                <input type="text" name="first_name" class="form-control input-solid mb-3"
+                       placeholder="First Name" required>
 
-                <div class="form-group">
-                    <input type="text" name="last_name" class="form-control input-solid"
-                           placeholder="@lang('Last Name')" required>
-                </div>
+                <input type="text" name="last_name" class="form-control input-solid mb-3"
+                       placeholder="Last Name" required>
 
-                <div class="form-group">
-                    <input type="email" name="email" class="form-control input-solid"
-                           placeholder="@lang('Email')" required>
-                </div>
+                <input type="email" name="email" class="form-control input-solid mb-3"
+                       placeholder="Email" required>
 
-                <div class="form-group">
-                    <input type="text" name="phone" class="form-control input-solid"
-                           placeholder="@lang('Phone Number')">
-                </div>
+                <input type="password" name="password" class="form-control input-solid mb-3"
+                       placeholder="Password" required>
 
-                <div class="form-group">
-                    <label>Date of Birth</label>
-                    <input type="date" name="birthday" class="form-control input-solid" required>
-                </div>
-
-                <div class="form-group">
-                    <label>Region</label>
-                    <select name="region" class="form-control input-solid" required>
-                        <option value="">Select your Region</option>
-                        <option value="LN">London</option>
-                        <option value="SE">South East England</option>
-                        <option value="SW">South West England</option>
-                        <option value="EE">East of England</option>
-                        <option value="NE">North East of England</option>
-                        <option value="WM">West Midlands</option>
-                        <option value="EM">East Midlands</option>
-                        <option value="YH">Yorkshire and the Humber</option>
-                        <option value="NW">North West England</option>
-                        <option value="WL">Wales</option>
-                        <option value="NI">Northern Ireland</option>
-                        <option value="SC">Scotland</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <input type="password" name="password"
-                           class="form-control input-solid"
-                           placeholder="@lang('Password')" required>
-                </div>
-
-                <div class="form-group">
-                    <input type="password" name="password_confirmation"
-                           class="form-control input-solid"
-                           placeholder="@lang('Confirm Password')" required>
-                </div>
+                <input type="password" name="password_confirmation"
+                       class="form-control input-solid mb-3"
+                       placeholder="Confirm Password" required>
 
                 <hr>
 
                 {{-- PAYMENT --}}
-                <div class="form-group">
-                    <label>@lang('Registration Fee')</label>
-                    <input type="number" step="0.01" name="amount" id="amount"
-                           class="form-control input-solid"
-                           value="10.00" readonly>
-                </div>
+                <label>Registration Fee</label>
+                <input type="number" name="amount" id="amount"
+                       class="form-control input-solid mb-3"
+                       value="10.00" readonly>
 
-                <div class="form-group">
-                    <label>Cardholder Name</label>
-                    <input type="text" id="cardholder-name"
-                           class="form-control input-solid" required>
-                </div>
+                <input type="text" id="cardholder-name"
+                       class="form-control input-solid mb-3"
+                       placeholder="Cardholder Name" required>
 
-                <div class="form-group">
-                    <label>Postcode</label>
-                    <input type="text" id="postcode"
-                           class="form-control input-solid" required>
-                </div>
+                <input type="text" id="postcode"
+                       class="form-control input-solid mb-3"
+                       placeholder="Postcode" required>
 
-                <div class="form-group">
-                    <label>Card Details</label>
-                    <div id="card-element" class="form-control input-solid"></div>
-                </div>
+                <div id="card-element" class="form-control input-solid mb-4"></div>
 
-                @if (setting('tos'))
-                    <div class="form-group mt-3">
-                        <input type="checkbox" name="tos" value="1" required>
-                        <label>
-                            @lang('I accept')
-                            <a href="#tos-modal" data-toggle="modal">@lang('Terms of Service')</a>
-                        </label>
-                    </div>
-                @endif
-
-                <div class="form-group mt-4">
-                    <button id="submit" class="btn btn-primary w-100">
-                        Pay & Register
-                    </button>
-                </div>
+                <button id="submit" class="btn btn-primary w-100">
+                    Pay & Register xxx
+                </button>
 
             </form>
         </div>
     </div>
-
-    <div class="text-center text-muted mt-3">
-        @lang('Already have an account?')
-        <a href="{{ route('login') }}">@lang('Login')</a>
-    </div>
 </div>
-
-{{-- TOS MODAL --}}
-@if (setting('tos'))
-<div class="modal fade" id="tos-modal">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5>@lang('Terms of Service')</h5>
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-            </div>
-            <div class="modal-body">
-                @include('auth.tos')
-            </div>
-        </div>
-    </div>
-</div>
-@endif
 
 @endsection
 

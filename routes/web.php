@@ -1,7 +1,9 @@
 <?php
 
 use App\Http\Controllers\PaidRegisterController;
+use App\Http\Controllers\PaymentIntentController;
 use \App\Http\Controllers\Web\Auth\LoginController;
+use App\Http\Controllers\Web\Auth\RegisterCompleteController;
 use \App\Http\Controllers\Web\Auth\RegisterController;
 use \App\Http\Controllers\Web\Auth\TwoFactorTokenController;
 use \App\Http\Controllers\Web\Auth\SocialAuthController;
@@ -38,6 +40,15 @@ Route::group(['middleware' => ['registration', 'guest']], function () {
     // Route::get('register', [RegisterController::class, 'show']);
     // Route::post('register', [RegisterController::class, 'register']);
 
+
+
+// Create PaymentIntent
+Route::post('/payments/intent', [PaymentIntentController::class, 'store'])
+    ->name('payment.intent');
+
+// Complete registration
+Route::post('/register/complete', RegisterCompleteController::class)
+    ->name('register.complete');
 
 
 Route::get('/register', [PaidRegisterController::class, 'show'])

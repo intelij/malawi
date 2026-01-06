@@ -6,14 +6,15 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!stripeKey) return;
 
     const stripe = Stripe(stripeKey);
+
+    const registrationForm = document.getElementById("registration-form");
     const submitButton = document.getElementById("submit");
-    const form = document.getElementById("registration-form");
 
     const elements = stripe.elements();
     const cardElement = elements.create("card", { hidePostalCode: true });
     cardElement.mount("#card-element");
 
-    form.addEventListener("submit", async (e) => {
+    registrationForm.addEventListener("submit", async (e) => {
         e.preventDefault();
 
         submitButton.disabled = true;
@@ -21,42 +22,70 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const cardholderName = document.getElementById("cardholder-name").value;
         const postcode = document.getElementById("postcode").value;
+        const amount = document.getElementById("amount").value;
 
-        const response = await fetch(form.dataset.intentUrl, {
-            method: "POST",
-            headers: {
-                "X-CSRF-TOKEN": document
-                    .querySelector('meta[name="csrf-token"]')
-                    .getAttribute("content"),
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                amount: document.getElementById("amount").value,
-            }),
-        });
-
-        const data = await response.json();
-
-        const { error, paymentIntent } =
-            await stripe.confirmCardPayment(data.clientSecret, {
-                payment_method: {
-                    card: cardElement,
-                    billing_details: {
-                        name: cardholderName,
-                        address: { postal_code: postcode },
+        try {
+            const response = await fetch(
+                registrationForm.dataset.intentUrl,
+                {
+                    method: "POST",
+                    headers: {
+                        "X-CSRF-TOKEN": document
+                            .querySelector('meta[name="csrf-token"]')
+                            .getAttribute("content"),
+                        "Content-Type": "application/json",
+                        "Accept": "application/json",
                     },
-                },
-            });
+                    body: JSON.stringify({
+                        amount,
+                        email: document.querySelector('[name="email"]').value,
+                        first_name: document.querySelector('[name="first_name"]').value,
+                        last_name: document.querySelector('[name="last_name"]').value,
+                    }),
+                }
+            );
 
-        if (error) {
-            alert(error.message);
+            const data = await response.json();
+
+            if (!data.clientSecret) {
+                throw new Error("Failed to create payment intent");
+            }
+
+            const { error, paymentIntent } =
+                await stripe.confirmCardPayment(data.clientSecret, {
+                    payment_method: {
+                        card: cardElement,
+                        billing_details: {
+                            name: cardholderName,
+                            address: { postal_code: postcode },
+                        },
+                    },
+                });
+
+            if (error) {
+                alert(error.message);
+                submitButton.disabled = false;
+                submitButton.textContent = "Pay Now";
+                return;
+            }
+
+            if (paymentIntent.status === "succeeded") {
+                // 🔥 Inject paymentIntent ID into the form
+                const hiddenInput = document.createElement("input");
+                hiddenInput.type = "hidden";
+                hiddenInput.name = "payment_intent_id";
+                hiddenInput.value = paymentIntent.id;
+                registrationForm.appendChild(hiddenInput);
+
+                // ✅ Submit real HTML form
+                registrationForm.submit();
+            }
+
+        } catch (err) {
+            console.error("Payment error:", err);
+            alert(err.message || "Payment failed.");
             submitButton.disabled = false;
             submitButton.textContent = "Pay Now";
-            return;
-        }
-
-        if (paymentIntent.status === "succeeded") {
-            form.submit();
         }
     });
 });
