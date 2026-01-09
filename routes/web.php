@@ -37,18 +37,6 @@ Route::get('login', [LoginController::class, 'show']);
 Route::post('login', [LoginController::class, 'login'])->name('login');
 Route::get('logout', [LoginController::class, 'logout'])->name('auth.logout');
 
-Route::middleware([DebugCsp::class])->group(function () {
-
-    Route::get('/register', [PaidRegisterController::class, 'show'])
-        ->name('register');
-
-    Route::post('/register/payment-intent', [PaidRegisterController::class, 'createPaymentIntent'])
-        ->name('payment.intent');
-
-    Route::post('/register/complete', [PaidRegisterController::class, 'complete'])
-        ->name('register.complete');
-});
-
 Route::group(['middleware' => ['registration', 'guest', DebugCsp::class]], function () {
     // Route::get('register', [RegisterController::class, 'show']);
     // Route::post('register', [RegisterController::class, 'register']);
