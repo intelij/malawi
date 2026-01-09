@@ -41,22 +41,22 @@ Route::group(['middleware' => ['registration', 'guest']], function () {
     // Route::post('register', [RegisterController::class, 'register']);
 
 
-// Create PaymentIntent
-Route::post('/payments/intent', [PaymentIntentController::class, 'store'])
-    ->name('pay.intent');
+    // Create PaymentIntent
+    Route::post('/payments/intent', [PaymentIntentController::class, 'store'])
+        ->name('pay.intent');
 
-// Complete registration
-Route::post('/register/complete', RegisterCompleteController::class)
-    ->name('register.complete');
+    // Complete registration
+    Route::post('/register/complete', RegisterCompleteController::class)
+        ->name('register.complete');
 
-Route::get('/register', [PaidRegisterController::class, 'show'])
-    ->name('register');
+    Route::get('/register', [PaidRegisterController::class, 'show'])
+        ->name('register');
 
-Route::post('/register/intent', [PaidRegisterController::class, 'createPaymentIntent'])
-    ->name('register.intent');
+    Route::post('/register/intent', [PaidRegisterController::class, 'createPaymentIntent'])
+        ->name('register.intent');
 
-Route::post('/register/complete', [PaidRegisterController::class, 'complete'])
-    ->name('register.complete');
+    Route::post('/register/complete', [PaidRegisterController::class, 'complete'])
+        ->name('register.complete');
 
 });
 

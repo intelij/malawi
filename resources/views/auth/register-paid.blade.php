@@ -50,20 +50,22 @@
                 <label>Registration Fee</label>
                 <input type="number" name="amount" id="amount"
                        class="form-control input-solid mb-3"
-                       value="999.00" readonly>
+                       value="7.20" readonly>
 
                 <input type="text" id="cardholder-name"
                        class="form-control input-solid mb-3"
+                       name="cardholder-name"
                        placeholder="Cardholder Name" required>
 
                 <input type="text" id="postcode"
                        class="form-control input-solid mb-3"
+                       name="postcode"
                        placeholder="Postcode" required>
 
                 <div id="card-element" class="form-control input-solid mb-4"></div>
 
                 <button id="submit" class="btn btn-primary w-100">
-                    Pay & Register xxx
+                    Pay & Register
                 </button>
 
             </form>

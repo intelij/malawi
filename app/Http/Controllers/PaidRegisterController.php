@@ -5,7 +5,11 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\Payment;
+use App\Models\Role;
+use App\Repositories\Role\RoleRepository;
+use App\Repositories\User\UserRepository;
 use App\Services\MembershipNumberGenerator;
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -15,6 +19,11 @@ use Stripe\PaymentIntent;
 
 class PaidRegisterController extends Controller
 {
+    public function __construct(private readonly UserRepository $users)
+    {
+        $this->middleware('registration')->only('show', 'register');
+    }
+
     public function show()
     {
         return view('auth.register-paid');
@@ -24,11 +33,11 @@ class PaidRegisterController extends Controller
     {
         Stripe::setApiKey(config('services.stripe.secret'));
 
-        $amount = setting('registration_fee') ?? 20; // USD
+        $amount = setting('registration_fee') ?? 6; // GBP
 
         $intent = PaymentIntent::create([
-            'amount' => $amount * 100,
-            'currency' => 'usd',
+            // 'amount' => $amount * 100,
+            'currency' => 'gbp',
             'automatic_payment_methods' => ['enabled' => true],
             'metadata' => [
                 'purpose' => 'registration'
@@ -40,12 +49,14 @@ class PaidRegisterController extends Controller
         ]);
     }
 
-    public function complete(Request $request)
+    public function complete(Request $request, RoleRepository $roles)
     {
         $request->validate([
             'payment_intent' => 'required|string',
-            'form.email' => 'required|email|unique:users,email',
-            'form.password' => 'required|min:8|confirmed',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|min:8|confirmed',
+            'first_name' => 'required|string',
+            'last_name' => 'required|string',
         ]);
 
         Stripe::setApiKey(config('services.stripe.secret'));
@@ -66,16 +77,16 @@ class PaidRegisterController extends Controller
             ], 409);
         }
 
-        DB::transaction(function () use ($request, $intent, &$user) {
+        DB::transaction(function () use ($request, $intent, &$user, $roles) {
 
-            $data = $request->form;
-
-            $user = User::create([
-                'first_name' => $data['first_name'],
-                'last_name'  => $data['last_name'],
-                'email'      => $data['email'],
-                'phone'      => $data['phone'] ?? null,
-                'password'   => Hash::make($data['password']),
+            $user = $this->users->create([
+                'first_name' => $request->first_name,
+                'last_name'  => $request->last_name,
+                'email'      => $request->email,
+                'phone'      => $request->phone,
+                'status'      => 'Unconfirmed',
+                'password'   => Hash::make($request->password),
+                'role_id'   => $roles->findByName(Role::DEFAULT_USER_ROLE)->id,
             ]);
 
             $user->membership_number =
@@ -83,22 +94,33 @@ class PaidRegisterController extends Controller
 
             $user->save();
 
-            $user->assignRole('Member');
-
             Payment::create([
-                'user_id'      => $user->id,
-                'amount'       => $intent->amount / 100,
-                'payment_type' => 'Registration',
-                'reference'    => $intent->id,
-                'status'       => 'paid',
+                'user_id'           => $user->id,
+                'payment_type'      => 'Registration Payment',
+                'amount'            => $intent->amount,
+                'reference'         => $intent->id,
+                'fundraiser_id'     => 0,
+                'membership_number' => $user->membership_number,
+                'verified'          => 1,
+                'image_name'        => "Online Stripe Payment {$intent->id}",
             ]);
+
         });
+
 
         Auth::login($user);
 
-        return response()->json([
-            'success' => true,
-            'redirect' => route('dashboard')
-        ]);
+        event(new Registered($user));
+
+        $message = setting('reg_email_confirmation')
+            ? __('Your account is created successfully! Please confirm your email.')
+            : __('Your account is created successfully!');
+
+        if (setting('approval.enabled')) {
+            return redirect('/login')->with('success', $message);
+        } else {
+            \Auth::login($user);
+            return redirect('/')->with('success', $message);
+        }
     }
 }
