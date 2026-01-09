@@ -151,6 +151,17 @@
                     class="form-control input-solid" value="{{ setting('stale_cutoff_period', 3) }}">
             </div>
 
+            <div class="form-group my-4">
+                <label for="registration_amount">
+                    @lang('Default Registration Amount') <br>
+                    <small class="text-muted">
+                        @lang('Set the default amount members need to pay for the registration.')
+                    </small>
+                </label>
+                <input type="text" name="registration_amount"
+                    class="form-control input-solid" value="{{ setting('registration_amount', 3) }}">
+            </div>
+
             <button type="submit" class="btn btn-primary">
                 @lang('Update')
             </button>

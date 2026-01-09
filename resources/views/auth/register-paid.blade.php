@@ -50,7 +50,7 @@
                 <label>Registration Fee</label>
                 <input type="number" name="amount" id="amount"
                        class="form-control input-solid mb-3"
-                       value="7.20" readonly>
+                       value="{{ setting('registration_amount', 0) }}" readonly>
 
                 <input type="text" id="cardholder-name"
                        class="form-control input-solid mb-3"
