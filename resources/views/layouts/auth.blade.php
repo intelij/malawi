@@ -6,10 +6,6 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    <meta name="stripe-key" content="{{ config('services.stripe.key') }}">
-
-
     <title>@yield('page-title') - {{ setting('app_name') }}</title>
 
     <link href="{{ asset('assets/css/app.css') }}" rel="stylesheet">

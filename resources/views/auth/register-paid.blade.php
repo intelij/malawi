@@ -44,8 +44,6 @@
                        class="form-control input-solid mb-3"
                        placeholder="Confirm Password" required>
 
-                <hr>
-
                 {{-- PAYMENT --}}
                 <label>Registration Fee</label>
                 <input type="number" name="amount" id="amount"
