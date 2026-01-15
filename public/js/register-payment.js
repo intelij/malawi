@@ -53,6 +53,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 throw new Error("Please complete all payment fields.");
             }
 
+            console.log("1. We hit this");
+
             // 🔁 Create PaymentIntent
             const response = await fetch(
                 registrationForm.dataset.intentUrl,
@@ -74,6 +76,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             );
 
+            console.log("2. We hit this", response);
+
             if (!response.ok) {
                 throw new Error("Failed to create payment intent");
             }
@@ -83,6 +87,8 @@ document.addEventListener("DOMContentLoaded", () => {
             if (!data.clientSecret) {
                 throw new Error("Invalid payment intent response");
             }
+
+            console.log("3. We hit this");
 
             // 💳 Confirm payment
             const { error, paymentIntent } =
@@ -101,6 +107,8 @@ document.addEventListener("DOMContentLoaded", () => {
             if (error) {
                 throw new Error(error.message);
             }
+
+            console.log("4. We hit this", paymentIntent);
 
             // ✅ Payment success
             if (paymentIntent.status === "succeeded") {
