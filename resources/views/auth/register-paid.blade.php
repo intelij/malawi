@@ -6,13 +6,13 @@
 
 <meta name="csrf-token" content="{{ csrf_token() }}">
 <meta name="stripe-key" content="{{ config('services.stripe.key') }}">
-<meta http-equiv="Content-Security-Policy"
+{{-- <meta http-equiv="Content-Security-Policy"
       content="
         script-src 'self' https://js.stripe.com https://m.stripe.network blob:;
         frame-src https://js.stripe.com;
         connect-src https://api.stripe.com;
         style-src 'self' 'unsafe-inline';
-      ">
+      "> --}}
 
 
 <div class="col-md-8 mx-auto my-10p">
@@ -68,7 +68,8 @@
                        name="postcode"
                        placeholder="Postcode" required>
 
-                <div id="card-element" class="form-control input-solid mb-4"></div>
+                {{-- <div id="card-element" class="form-control input-solid mb-4"></div> --}}
+                <div id="card-element"></div>
 
                 <button id="submit" class="btn btn-primary w-100">
                     Pay & Register

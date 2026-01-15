@@ -16,11 +16,16 @@ class ContentSecurityPolicy
             'Content-Security-Policy',
             implode('; ', [
                 "default-src 'self'",
-                "script-src 'self' https://js.stripe.com https://m.stripe.network blob:",
-                "frame-src https://js.stripe.com",
-                "connect-src https://api.stripe.com",
+                "script-src 'self' 'unsafe-inline' https://js.stripe.com https://m.stripe.network blob:",
+                "script-src-elem 'self' 'unsafe-inline' https://js.stripe.com https://m.stripe.network blob:",
                 "style-src 'self' 'unsafe-inline'",
-                "img-src 'self' data:",
+                "frame-src https://js.stripe.com https://m.stripe.network",
+                "connect-src 'self' https://api.stripe.com https://m.stripe.network https://q.stripe.com",
+                "img-src 'self' data: https://q.stripe.com",
+                "font-src 'self' data:",
+                "object-src 'none'",
+                "base-uri 'self'",
+                "form-action 'self'",
             ])
         );
 
