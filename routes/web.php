@@ -27,6 +27,7 @@ use App\Http\Controllers\Web\SettingsController;
 use Vanguard\UserActivity\Http\Controllers\Web\ActivityController as WebActivityController;
 use App\Http\Controllers\Web\InstallController;
 use App\Http\Controllers\Web\Users\PaymentController;
+use App\Http\Middleware\ContentSecurityPolicy;
 use App\Http\Middleware\DebugCsp;
 use Vanguard\UserActivity\Http\Controllers\Web\ActivityController;
 
@@ -37,14 +38,7 @@ Route::get('login', [LoginController::class, 'show']);
 Route::post('login', [LoginController::class, 'login'])->name('login');
 Route::get('logout', [LoginController::class, 'logout'])->name('auth.logout');
 
-Route::group(['middleware' => ['registration', 'guest']], function () {
-
-    Route::get('/register', [PaidRegisterController::class, 'show'])
-        ->name('register');
-
-});
-
-Route::group(['middleware' => ['registration', 'guest']], function () {
+Route::group(['middleware' => ['registration', 'guest', ContentSecurityPolicy::class]], function () {
     // Route::get('register', [RegisterController::class, 'show']);
     // Route::post('register', [RegisterController::class, 'register']);
 

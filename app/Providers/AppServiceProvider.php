@@ -15,6 +15,7 @@ use App\Repositories\Session\DbSession;
 use App\Repositories\Session\SessionRepository;
 use App\Repositories\User\EloquentUser;
 use App\Repositories\User\UserRepository;
+use Illuminate\Support\Facades\View;
 use Route;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -34,6 +35,12 @@ class AppServiceProvider extends ServiceProvider
         });
 
         \Illuminate\Pagination\Paginator::useBootstrap();
+
+        View::composer('*', function ($view) {
+            if (app()->bound('cspNonce')) {
+                $view->with('cspNonce', app('cspNonce'));
+            }
+        });
 
         $this->bindUser();
         $this->bindRole();

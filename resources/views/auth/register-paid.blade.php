@@ -64,7 +64,7 @@
                 {{-- <div id="card-element"></div> --}}
 
                 <button id="submit" class="btn btn-primary w-100">
-                    Pay & Register
+                    Pay & Register xyz
                 </button>
 
             </form>
@@ -75,6 +75,6 @@
 @endsection
 
 @section('scripts')
-<script src="https://js.stripe.com/v3/"></script>
-<script src="{{ asset('js/register-payment.js') }}" defer></script>
+<script src="https://js.stripe.com/v3/" nonce="{{ $cspNonce }}"></script>
+<script src="{{ asset('js/register-payment.js') }}" nonce="{{ $cspNonce }}" defer></script>
 @endsection
