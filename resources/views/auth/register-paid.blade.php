@@ -68,8 +68,8 @@
                        name="postcode"
                        placeholder="Postcode" required>
 
-                {{-- <div id="card-element" class="form-control input-solid mb-4"></div> --}}
-                <div id="card-element"></div>
+                <div id="card-element" class="form-control input-solid mb-4"></div>
+                {{-- <div id="card-element"></div> --}}
 
                 <button id="submit" class="btn btn-primary w-100">
                     Pay & Register
