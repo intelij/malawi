@@ -38,13 +38,18 @@ Route::get('login', [LoginController::class, 'show']);
 Route::post('login', [LoginController::class, 'login'])->name('login');
 Route::get('logout', [LoginController::class, 'logout'])->name('auth.logout');
 
+Route::group(['middleware' => ['registration', 'guest', ContentSecurityPolicy::class]], function () {
+    // Route::get('register', [RegisterController::class, 'show']);
+    // Route::post('register', [RegisterController::class, 'register']);
+
+
     // Create PaymentIntent
     Route::post('/payments/intent', [PaymentIntentController::class, 'store'])
         ->name('pay.intent');
 
     // Complete registration
-    Route::post('/register/complete', RegisterCompleteController::class)
-        ->name('register.complete');
+    // Route::post('/register/complete', RegisterCompleteController::class)
+    //     ->name('register.complete');
 
     Route::get('/register', [PaidRegisterController::class, 'show'])
         ->name('register');
@@ -55,29 +60,7 @@ Route::get('logout', [LoginController::class, 'logout'])->name('auth.logout');
     Route::post('/register/complete', [PaidRegisterController::class, 'complete'])
         ->name('register.complete');
 
-// Route::group(['middleware' => ['registration', 'guest', ContentSecurityPolicy::class]], function () {
-//     // Route::get('register', [RegisterController::class, 'show']);
-//     // Route::post('register', [RegisterController::class, 'register']);
-
-
-//     // Create PaymentIntent
-//     Route::post('/payments/intent', [PaymentIntentController::class, 'store'])
-//         ->name('pay.intent');
-
-//     // Complete registration
-//     Route::post('/register/complete', RegisterCompleteController::class)
-//         ->name('register.complete');
-
-//     Route::get('/register', [PaidRegisterController::class, 'show'])
-//         ->name('register');
-
-//     Route::post('/register/intent', [PaidRegisterController::class, 'createPaymentIntent'])
-//         ->name('register.intent');
-
-//     Route::post('/register/complete', [PaidRegisterController::class, 'complete'])
-//         ->name('register.complete');
-
-// });
+});
 
 Route::emailVerification();
 

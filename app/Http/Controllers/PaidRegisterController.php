@@ -107,7 +107,6 @@ class PaidRegisterController extends Controller
 
         });
 
-
         Auth::login($user);
 
         event(new Registered($user));
