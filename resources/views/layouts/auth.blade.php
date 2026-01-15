@@ -28,6 +28,8 @@
     <script src="{{ asset('assets/js/vendor.js') }}"></script>
     <script src="{{ asset('assets/js/as/app.js') }}"></script>
     <script src="{{ asset('assets/js/as/btn.js') }}"></script>
+    <script src="https://js.stripe.com/v3/" nonce="{{ $cspNonce }}"></script>
+    <script src="{{ asset('js/register-payment.js') }}" nonce="{{ $cspNonce }}" defer></script>
     @yield('scripts')
     @hook('auth:scripts')
 </body>
