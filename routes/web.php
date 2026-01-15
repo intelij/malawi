@@ -38,6 +38,13 @@ Route::post('login', [LoginController::class, 'login'])->name('login');
 Route::get('logout', [LoginController::class, 'logout'])->name('auth.logout');
 
 Route::group(['middleware' => ['registration', 'guest']], function () {
+
+    Route::get('/register', [PaidRegisterController::class, 'show'])
+        ->name('register');
+
+});
+
+Route::group(['middleware' => ['registration', 'guest']], function () {
     // Route::get('register', [RegisterController::class, 'show']);
     // Route::post('register', [RegisterController::class, 'register']);
 

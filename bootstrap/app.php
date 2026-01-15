@@ -28,7 +28,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
 
         // ✅ GLOBAL MIDDLEWARE (runs on every request)
-        // $middleware->append(\App\Http\Middleware\ContentSecurityPolicy::class);
+        $middleware->append(\App\Http\Middleware\ContentSecurityPolicy::class);
 
         $middleware->alias([
             'auth' => \App\Http\Middleware\Authenticate::class,
