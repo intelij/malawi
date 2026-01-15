@@ -55,7 +55,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
             console.log("1. We hit this");
 
-            // 🔁 Create PaymentIntent
+            const formData = new FormData(registrationForm);
+
+            // Add/override amount explicitly
+            formData.set("amount", amount);
+
             const response = await fetch(
                 registrationForm.dataset.intentUrl,
                 {
@@ -64,17 +68,32 @@ document.addEventListener("DOMContentLoaded", () => {
                         "X-CSRF-TOKEN": document
                             .querySelector('meta[name="csrf-token"]')
                             .getAttribute("content"),
-                        "Content-Type": "application/json",
                         "Accept": "application/json",
                     },
-                    body: JSON.stringify({
-                        amount: amount,
-                        email: document.querySelector('[name="email"]').value,
-                        first_name: document.querySelector('[name="first_name"]').value,
-                        last_name: document.querySelector('[name="last_name"]').value,
-                    }),
+                    body: formData,
                 }
             );
+
+            // // 🔁 Create PaymentIntent
+            // const response = await fetch(
+            //     registrationForm.dataset.intentUrl,
+            //     {
+            //         method: "POST",
+            //         headers: {
+            //             "X-CSRF-TOKEN": document
+            //                 .querySelector('meta[name="csrf-token"]')
+            //                 .getAttribute("content"),
+            //             "Content-Type": "application/json",
+            //             "Accept": "application/json",
+            //         },
+            //         body: JSON.stringify({
+            //             amount: amount,
+            //             email: document.querySelector('[name="email"]').value,
+            //             first_name: document.querySelector('[name="first_name"]').value,
+            //             last_name: document.querySelector('[name="last_name"]').value,
+            //         }),
+            //     }
+            // );
 
             console.log("2. We hit this", response);
 
