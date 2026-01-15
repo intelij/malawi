@@ -6,14 +6,6 @@
 
 <meta name="csrf-token" content="{{ csrf_token() }}">
 <meta name="stripe-key" content="{{ config('services.stripe.key') }}">
-{{-- <meta http-equiv="Content-Security-Policy"
-      content="
-        script-src 'self' https://js.stripe.com https://m.stripe.network blob:;
-        frame-src https://js.stripe.com;
-        connect-src https://api.stripe.com;
-        style-src 'self' 'unsafe-inline';
-      "> --}}
-
 
 <div class="col-md-8 mx-auto my-10p">
     <div class="card mt-5">
