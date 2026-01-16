@@ -19,32 +19,56 @@ class ContentSecurityPolicy
         /** @var Response $response */
         $response = $next($request);
 
+        // $response->headers->set(
+        //     'Content-Security-Policy',
+        //     implode('; ', [
+        //         "default-src 'self'",
+
+        //         // Stripe scripts ONLY
+        //         "script-src 'self' 'nonce-{$nonce}' https://js.stripe.com https://m.stripe.network",
+
+        //         // Needed for Stripe Elements iframe loader
+        //         "script-src-elem 'self' 'nonce-{$nonce}' https://js.stripe.com https://m.stripe.network",
+
+        //         // Stripe iframes
+        //         "frame-src https://js.stripe.com https://m.stripe.network",
+
+        //         // Stripe API + your own backend
+        //         "connect-src 'self' https://api.stripe.com https://m.stripe.network https://q.stripe.com",
+
+        //         // Stripe images (fraud detection)
+        //         "img-src 'self' data: https://q.stripe.com",
+
+        //         // Allow inline styles (Bootstrap / Stripe injects styles)
+        //         "style-src 'self' 'unsafe-inline'",
+
+        //         "font-src 'self' data:",
+        //         "object-src 'none'",
+        //         "base-uri 'self'",
+        //         "form-action 'self'",
+        //     ])
+        // );
+
         $response->headers->set(
             'Content-Security-Policy',
             implode('; ', [
                 "default-src 'self'",
 
-                // Stripe scripts ONLY
-                "script-src 'self' 'nonce-{$nonce}' https://js.stripe.com https://m.stripe.network",
-
-                // Needed for Stripe Elements iframe loader
-                "script-src-elem 'self' 'nonce-{$nonce}' https://js.stripe.com https://m.stripe.network",
+                // Stripe JS
+                "script-src 'self' 'nonce-{$nonce}' https://js.stripe.com",
+                "script-src-elem 'self' 'nonce-{$nonce}' https://js.stripe.com",
 
                 // Stripe iframes
-                "frame-src https://js.stripe.com https://m.stripe.network",
+                "frame-src https://m.stripe.network https://hooks.stripe.com",
 
-                // Stripe API + your own backend
-                "connect-src 'self' https://api.stripe.com https://m.stripe.network https://q.stripe.com",
+                // 🔑 THIS FIXES YOUR ERROR
+                "connect-src 'self' https://api.stripe.com https://r.stripe.com https://q.stripe.com",
 
-                // Stripe images (fraud detection)
                 "img-src 'self' data: https://q.stripe.com",
-
-                // Allow inline styles (Bootstrap / Stripe injects styles)
                 "style-src 'self' 'unsafe-inline'",
-
                 "font-src 'self' data:",
                 "object-src 'none'",
-                "base-uri 'self'",
+                "base-uri 'none'",
                 "form-action 'self'",
             ])
         );
