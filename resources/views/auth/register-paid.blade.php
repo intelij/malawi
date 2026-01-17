@@ -19,8 +19,7 @@
 
             <form id="registration-form"
                   method="POST"
-                  action="{{ route('register.complete') }}"
-                  data-intent-url="{{ route('pay.intent') }}"
+                  action="{{ route('register.checkout') }}"
                   autocomplete="off">
 
                 @csrf
@@ -44,27 +43,8 @@
                        class="form-control input-solid mb-3"
                        placeholder="Confirm Password" required>
 
-                {{-- PAYMENT --}}
-                <label>Registration Fee</label>
-                <input type="number" name="amount" id="amount"
-                       class="form-control input-solid mb-3"
-                       value="{{ setting('registration_amount', 0) }}" readonly>
-
-                <input type="text" id="cardholder-name"
-                       class="form-control input-solid mb-3"
-                       name="cardholder-name"
-                       placeholder="Cardholder Name" required>
-
-                <input type="text" id="postcode"
-                       class="form-control input-solid mb-3"
-                       name="postcode"
-                       placeholder="Postcode" required>
-
-                <div id="card-element" class="form-control input-solid mb-4"></div>
-                {{-- <div id="card-element"></div> --}}
-
                 <button id="submit" class="btn btn-primary w-100">
-                    Pay & Register xyz
+                    Pay & Register
                 </button>
 
             </form>
@@ -75,6 +55,4 @@
 @endsection
 
 @section('scripts')
-{{-- <script src="https://js.stripe.com/v3/" nonce="{{ $cspNonce }}"></script>
-<script src="{{ asset('js/register-payment.js') }}" nonce="{{ $cspNonce }}" defer></script> --}}
 @endsection
